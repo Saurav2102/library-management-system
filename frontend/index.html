@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-content">
+            <div class="brand">
+                <span class="brand-icon">📚</span>
+                <div>
+                    <h1>Library Management System</h1>
+                    <p>Database Management Project</p>
+                </div>
+            </div>
+
+            <div class="nav-right">
+                <span class="status-indicator">PostgreSQL Connected</span>
+                <button class="btn btn-primary" id="openAddBtn">+ Add Book</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="stats-row">
+            <div class="stat-card">
+                <span class="stat-title">Total Books</span>
+                <span class="stat-count" id="totalBooks">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Available</span>
+                <span class="stat-count green" id="availableBooks">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Issued</span>
+                <span class="stat-count orange" id="issuedBooks">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Overdue</span>
+                <span class="stat-count red" id="overdueBooks">0</span>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="toolbar">
+                <div class="tabs">
+                    <button class="tab active" data-tab="all">All (<span id="allCount">0</span>)</button>
+                    <button class="tab" data-tab="available">Available (<span id="availCount">0</span>)</button>
+                    <button class="tab" data-tab="issued">Issued (<span id="issueCount">0</span>)</button>
+                    <button class="tab" data-tab="overdue">Overdue (<span id="overdueCount">0</span>)</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="searchInput" placeholder="Search title, author, ISBN...">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Academics">Academics</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Self-Help">Self-Help</option>
+                        <option value="Philosophy">Philosophy</option>
+                        <option value="Science">Science</option>
+                        <option value="History">History</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table id="booksTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title & Author</th>
+                            <th>ISBN</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Borrower</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="booksBody"></tbody>
+                </table>
+
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <p>No books found.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-bg" id="addModal">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h3>Add New Book</h3>
+                <button class="close-btn" id="closeAddModal">&times;</button>
+            </div>
+            <form id="addBookForm">
+                <div class="form-body">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="title" placeholder="Enter book title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Author</label>
+                        <input type="text" id="author" placeholder="Enter author name" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ISBN</label>
+                            <input type="text" id="isbn" placeholder="e.g. 978-0132350884" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="category" required>
+                                <option value="">Select category</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Academics">Academics</option>
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Self-Help">Self-Help</option>
+                                <option value="Philosophy">Philosophy</option>
+                                <option value="Science">Science</option>
+                                <option value="History">History</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-bottom">
+                    <button type="button" class="btn btn-secondary" id="cancelAddBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="issueModal">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h3>Issue Book</h3>
+                <button class="close-btn" id="closeIssueModal">&times;</button>
+            </div>
+            <div class="form-body">
+                <p id="issueBookTitle" class="modal-sub"></p>
+                <div class="form-group">
+                    <label>Borrower Name</label>
+                    <input type="text" id="borrowerName" placeholder="Enter borrower name">
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" id="dueDateInput">
+                </div>
+            </div>
+            <div class="modal-bottom">
+                <button type="button" class="btn btn-secondary" id="cancelIssueBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmIssueBtn">Issue Book</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
