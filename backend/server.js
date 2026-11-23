@@ -11,6 +11,28 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
+const initTable = async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS books (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                author VARCHAR(255) NOT NULL,
+                isbn VARCHAR(20) UNIQUE NOT NULL,
+                category VARCHAR(100) NOT NULL,
+                status VARCHAR(10) DEFAULT 'Available',
+                borrower VARCHAR(255) DEFAULT NULL,
+                issue_date DATE DEFAULT NULL,
+                due_date DATE DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+    } catch (err) {
+        console.error('Database init error:', err.message);
+    }
+};
+initTable();
+
 app.get('/api/books', async (req, res) => {
     try {
         const { search } = req.query;
