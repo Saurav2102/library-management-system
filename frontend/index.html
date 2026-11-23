@@ -1,65 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="nav-content">
+    <header class="app-header">
+        <div class="header-inner">
             <div class="brand">
-                <span class="brand-icon">📚</span>
-                <div>
+                <div class="brand-logo">📚</div>
+                <div class="brand-info">
                     <h1>Library Management System</h1>
-                    <p>Database Management Project</p>
+                    <p>Enterprise Catalog & Circulation System</p>
                 </div>
             </div>
 
-            <div class="nav-right">
-                <span class="status-indicator">PostgreSQL Connected</span>
-                <button class="btn btn-primary" id="openAddBtn">+ Add Book</button>
+            <div class="header-actions">
+                <div class="status-pill">
+                    <span class="live-dot"></span>
+                    <span>PostgreSQL Live</span>
+                </div>
+
+                <button class="icon-btn" id="themeToggle" title="Toggle Dark/Light Mode">
+                    <span id="themeIcon">🌙</span>
+                </button>
+
+                <button class="btn btn-secondary" id="exportCsvBtn" title="Download catalog as CSV">
+                    <span>⬇</span> Export CSV
+                </button>
+
+                <button class="btn btn-primary" id="openAddModalBtn">
+                    <span>+</span> Add Book
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="container">
+    <main class="app-body">
 
-        <section class="stats-row">
-            <div class="stat-card">
-                <span class="stat-title">Total Books</span>
-                <span class="stat-count" id="totalBooks">0</span>
+        <section class="metrics-container">
+            <div class="metric-card metric-total">
+                <div class="metric-icon">📖</div>
+                <div class="metric-content">
+                    <span class="metric-title">Total Catalog</span>
+                    <span class="metric-number" id="metricTotal">0</span>
+                    <span class="metric-sub" id="metricCategoriesCount">0 Categories</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-title">Available</span>
-                <span class="stat-count green" id="availableBooks">0</span>
+
+            <div class="metric-card metric-available">
+                <div class="metric-icon">✅</div>
+                <div class="metric-content">
+                    <span class="metric-title">Available on Shelf</span>
+                    <span class="metric-number" id="metricAvailable">0</span>
+                    <span class="metric-sub" id="metricAvailRate">0% of collection</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-title">Issued</span>
-                <span class="stat-count orange" id="issuedBooks">0</span>
+
+            <div class="metric-card metric-issued">
+                <div class="metric-icon">📤</div>
+                <div class="metric-content">
+                    <span class="metric-title">In Circulation</span>
+                    <span class="metric-number" id="metricIssued">0</span>
+                    <span class="metric-sub">Active borrowings</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-title">Overdue</span>
-                <span class="stat-count red" id="overdueBooks">0</span>
+
+            <div class="metric-card metric-overdue">
+                <div class="metric-icon">⚠️</div>
+                <div class="metric-content">
+                    <span class="metric-title">Overdue Items</span>
+                    <span class="metric-number" id="metricOverdue">0</span>
+                    <span class="metric-sub" id="metricFines">$0.00 in total fines</span>
+                </div>
             </div>
         </section>
 
-        <section class="panel">
-            <div class="toolbar">
-                <div class="tabs">
-                    <button class="tab active" data-tab="all">All (<span id="allCount">0</span>)</button>
-                    <button class="tab" data-tab="available">Available (<span id="availCount">0</span>)</button>
-                    <button class="tab" data-tab="issued">Issued (<span id="issueCount">0</span>)</button>
-                    <button class="tab" data-tab="overdue">Overdue (<span id="overdueCount">0</span>)</button>
+        <section class="category-strip" id="categoryStrip">
+            <span class="strip-label">Categories:</span>
+            <div class="category-pills-list" id="categoryPillsList"></div>
+        </section>
+
+        <section class="catalog-panel">
+            <div class="panel-header">
+                <div class="tab-group">
+                    <button class="tab-item active" data-status="all">
+                        All Books <span class="tab-badge" id="badgeAll">0</span>
+                    </button>
+                    <button class="tab-item" data-status="Available">
+                        Available <span class="tab-badge" id="badgeAvailable">0</span>
+                    </button>
+                    <button class="tab-item" data-status="Issued">
+                        Issued <span class="tab-badge" id="badgeIssued">0</span>
+                    </button>
+                    <button class="tab-item" data-status="Overdue">
+                        Overdue <span class="tab-badge red" id="badgeOverdue">0</span>
+                    </button>
                 </div>
 
-                <div class="filters">
-                    <input type="text" id="searchInput" placeholder="Search title, author, ISBN...">
-                    <select id="categoryFilter">
+                <div class="panel-controls">
+                    <div class="search-input-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search title, author, ISBN, borrower...">
+                        <button class="clear-btn" id="clearSearchBtn">✕</button>
+                    </div>
+
+                    <select id="categorySelect" class="filter-dropdown">
                         <option value="">All Categories</option>
                         <option value="Technology">Technology</option>
                         <option value="Academics">Academics</option>
@@ -71,59 +123,91 @@
                         <option value="History">History</option>
                         <option value="Other">Other</option>
                     </select>
+
+                    <select id="sortSelect" class="filter-dropdown">
+                        <option value="default">Sort: Default</option>
+                        <option value="title_asc">Title (A to Z)</option>
+                        <option value="title_desc">Title (Z to A)</option>
+                        <option value="newest">Recently Added</option>
+                        <option value="due_soon">Due Date (Urgent First)</option>
+                    </select>
+
+                    <div class="view-toggle">
+                        <button class="toggle-view-btn active" id="viewTableBtn" title="Table View">☰</button>
+                        <button class="toggle-view-btn" id="viewGridBtn" title="Grid View">⊞</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="table-wrap">
-                <table id="booksTable">
+            <!-- Table View -->
+            <div class="view-container table-view" id="tableViewWrap">
+                <table class="main-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Title & Author</th>
+                            <th style="width: 48px;">#</th>
+                            <th>Book Details</th>
                             <th>ISBN</th>
                             <th>Category</th>
                             <th>Status</th>
-                            <th>Borrower</th>
+                            <th>Borrower Info</th>
                             <th>Issue Date</th>
-                            <th>Due Date</th>
-                            <th>Actions</th>
+                            <th>Due Date & Fines</th>
+                            <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="booksBody"></tbody>
+                    <tbody id="booksTableBody"></tbody>
                 </table>
+            </div>
 
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    <p>No books found.</p>
-                </div>
+            <!-- Grid Card View -->
+            <div class="view-container grid-view" id="gridViewWrap" style="display: none;">
+                <div class="cards-grid" id="booksCardsGrid"></div>
+            </div>
+
+            <div class="empty-placeholder" id="emptyState" style="display: none;">
+                <div class="empty-icon">📭</div>
+                <h3>No books found</h3>
+                <p>Try adjusting your search terms or filters.</p>
+                <button class="btn btn-secondary" id="resetFiltersBtn">Reset Filters</button>
+            </div>
+
+            <div class="panel-footer">
+                <span id="footerCountText">Showing 0 books</span>
+                <span class="footer-note">⚡ Real-time synchronization active</span>
             </div>
         </section>
+
     </main>
 
-    <div class="modal-bg" id="addModal">
-        <div class="modal-box">
-            <div class="modal-top">
-                <h3>Add New Book</h3>
-                <button class="close-btn" id="closeAddModal">&times;</button>
+    <!-- Modal: Add Book -->
+    <div class="modal-backdrop" id="addBookModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Add New Book</h3>
+                    <p>Enter book metadata to save into PostgreSQL catalog.</p>
+                </div>
+                <button class="close-modal-btn" id="closeAddModal">&times;</button>
             </div>
             <form id="addBookForm">
-                <div class="form-body">
-                    <div class="form-group">
-                        <label>Title</label>
-                        <input type="text" id="title" placeholder="Enter book title" required>
+                <div class="modal-content">
+                    <div class="form-field">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" placeholder="e.g. Clean Architecture" required>
                     </div>
-                    <div class="form-group">
-                        <label>Author</label>
-                        <input type="text" id="author" placeholder="Enter author name" required>
+                    <div class="form-field">
+                        <label for="author">Author *</label>
+                        <input type="text" id="author" placeholder="e.g. Robert C. Martin" required>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>ISBN</label>
-                            <input type="text" id="isbn" placeholder="e.g. 978-0132350884" required>
+                    <div class="form-split">
+                        <div class="form-field">
+                            <label for="isbn">ISBN Code *</label>
+                            <input type="text" id="isbn" placeholder="e.g. 978-0134494166" required>
                         </div>
-                        <div class="form-group">
-                            <label>Category</label>
+                        <div class="form-field">
+                            <label for="category">Category *</label>
                             <select id="category" required>
-                                <option value="">Select category</option>
+                                <option value="" disabled selected>Select category</option>
                                 <option value="Technology">Technology</option>
                                 <option value="Academics">Academics</option>
                                 <option value="Fiction">Fiction</option>
@@ -137,39 +221,106 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-bottom">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="cancelAddBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Book</button>
+                    <button type="submit" class="btn btn-primary">Save to Catalog</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="modal-bg" id="issueModal">
-        <div class="modal-box">
-            <div class="modal-top">
-                <h3>Issue Book</h3>
-                <button class="close-btn" id="closeIssueModal">&times;</button>
-            </div>
-            <div class="form-body">
-                <p id="issueBookTitle" class="modal-sub"></p>
-                <div class="form-group">
-                    <label>Borrower Name</label>
-                    <input type="text" id="borrowerName" placeholder="Enter borrower name">
+    <!-- Modal: Edit Book -->
+    <div class="modal-backdrop" id="editBookModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Edit Book Details</h3>
+                    <p>Update title, author, category, or ISBN.</p>
                 </div>
-                <div class="form-group">
-                    <label>Due Date</label>
+                <button class="close-modal-btn" id="closeEditModal">&times;</button>
+            </div>
+            <form id="editBookForm">
+                <input type="hidden" id="editBookId">
+                <div class="modal-content">
+                    <div class="form-field">
+                        <label for="editTitle">Title *</label>
+                        <input type="text" id="editTitle" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="editAuthor">Author *</label>
+                        <input type="text" id="editAuthor" required>
+                    </div>
+                    <div class="form-split">
+                        <div class="form-field">
+                            <label for="editIsbn">ISBN Code *</label>
+                            <input type="text" id="editIsbn" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="editCategory">Category *</label>
+                            <select id="editCategory" required>
+                                <option value="Technology">Technology</option>
+                                <option value="Academics">Academics</option>
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Self-Help">Self-Help</option>
+                                <option value="Philosophy">Philosophy</option>
+                                <option value="Science">Science</option>
+                                <option value="History">History</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Issue Book -->
+    <div class="modal-backdrop" id="issueBookModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Issue Book</h3>
+                    <p id="issueTargetBookTitle" class="modal-book-subtitle"></p>
+                </div>
+                <button class="close-modal-btn" id="closeIssueModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="form-field">
+                    <label for="borrowerName">Borrower's Full Name *</label>
+                    <input type="text" id="borrowerName" placeholder="e.g. John Doe">
+                </div>
+                <div class="form-field">
+                    <label for="borrowerId">Student / Member ID (Optional)</label>
+                    <input type="text" id="borrowerId" placeholder="e.g. STU-2026-084">
+                </div>
+                <div class="form-field">
+                    <label>Loan Duration Preset</label>
+                    <div class="preset-buttons-row">
+                        <button type="button" class="preset-pill" data-days="7">7 Days</button>
+                        <button type="button" class="preset-pill active" data-days="14">14 Days</button>
+                        <button type="button" class="preset-pill" data-days="21">21 Days</button>
+                        <button type="button" class="preset-pill" data-days="30">30 Days</button>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label for="dueDateInput">Due Date *</label>
                     <input type="date" id="dueDateInput">
                 </div>
             </div>
-            <div class="modal-bottom">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="cancelIssueBtn">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmIssueBtn">Issue Book</button>
+                <button type="button" class="btn btn-primary" id="confirmIssueBtn">Confirm Checkout</button>
             </div>
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <!-- Toast Notification Hub -->
+    <div class="toast-hub" id="toastHub"></div>
 
     <script src="app.js"></script>
 </body>
