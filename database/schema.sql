@@ -15,6 +15,3 @@ CREATE TABLE IF NOT EXISTS books (
     due_date DATE DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- Note: A complete 50+ real university book dataset is available in:
--- database/real_library_dataset.csv
